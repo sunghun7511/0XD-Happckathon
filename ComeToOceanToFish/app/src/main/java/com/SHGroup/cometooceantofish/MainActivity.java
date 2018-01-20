@@ -1,5 +1,6 @@
 package com.SHGroup.cometooceantofish;
 
+import android.os.StrictMode;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -13,31 +14,28 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.SHGroup.cometooceantofish.fragments.CommunityFragment;
+import com.SHGroup.cometooceantofish.fragments.FragmentBase;
 import com.SHGroup.cometooceantofish.fragments.LendFragment;
-import com.SHGroup.cometooceantofish.fragments.MainFragment;
 import com.SHGroup.cometooceantofish.fragments.PartyFragment;
 
+import java.util.HashMap;
+
 public class MainActivity extends AppCompatActivity {
-
-    /**
-     * The {@link android.support.v4.view.PagerAdapter} that will provide
-     * fragments for each of the sections. We use a
-     * {@link FragmentPagerAdapter} derivative, which will keep every
-     * loaded fragment in memory. If this becomes too memory intensive, it
-     * may be best to switch to a
-     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
-     */
     private SectionsPagerAdapter mSectionsPagerAdapter;
-
-    /**
-     * The {@link ViewPager} that will host the section contents.
-     */
     private ViewPager mViewPager;
+
+    private String access_token;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        if (android.os.Build.VERSION.SDK_INT > 9) {
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+        }
+
+        access_token = getIntent().getStringExtra("access_token");
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -78,23 +76,30 @@ public class MainActivity extends AppCompatActivity {
             super(fm);
         }
 
+        private final HashMap<Integer, FragmentBase> maps = new HashMap<>();
+
         @Override
         public Fragment getItem(int position) {
-            if(position == 0){
-                return new MainFragment();
-            }else if(position == 1){
-                return new LendFragment();
-            }else if(position == 2){
-                return new CommunityFragment();
-            }else if(position == 3){
-                return new PartyFragment();
+            FragmentBase fb = null;
+            if(maps.containsKey(position)){
+                fb = maps.get(position);
+            }else{
+                if(position == 0){
+                    fb = new LendFragment();
+                }else if(position == 1){
+                    fb = new CommunityFragment();
+                }else if(position == 2){
+                    fb = new PartyFragment();
+                }
+                maps.put(position, fb);
             }
-            return null;
+            if(fb != null)
+                fb.setAccessToken(access_token);
+            return fb;
         }
 
         @Override
         public int getCount() {
-            // Show 3 total pages.
             return 3;
         }
     }

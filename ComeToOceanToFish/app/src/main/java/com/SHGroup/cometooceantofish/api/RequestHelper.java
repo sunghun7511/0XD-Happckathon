@@ -8,10 +8,16 @@ public class RequestHelper {
     private final String url;
 
     private String encoding = "utf-8";
+
+    private boolean useCaches = false;
+    private boolean useDefaultCaches = false;
+
     private RequestHelper.RequestType requestType = RequestHelper.RequestType.GET;
     private Map<String, String> headers = new HashMap<>();
 
     private Map<String, String> query = new HashMap<>();
+    private Map<String, Integer> query_i = new HashMap<>();
+    private Map<String, InputStream> files = new HashMap<>();
 
     public RequestHelper(String url){
         this.url = url;
@@ -32,6 +38,16 @@ public class RequestHelper {
         return this;
     }
 
+    public RequestHelper setUseCaches(boolean useCaches){
+        this.useCaches = useCaches;
+        return this;
+    }
+
+    public RequestHelper setUseDefaultCaches(boolean useDefaultCaches){
+        this.useDefaultCaches = useDefaultCaches;
+        return this;
+    }
+
     public RequestHelper putDefaultHeader(){
 
         headers.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Whale/1.0.39.16 Safari/537.36");
@@ -49,6 +65,18 @@ public class RequestHelper {
         query.put(key, value);
         return this;
     }
+    public RequestHelper putQuery(String key, int value){
+        query_i.put(key, value);
+        return this;
+    }
+
+    public RequestHelper putFile(String fieldName, InputStream uploadFile) {
+        files.put(fieldName, uploadFile);
+        return this;
+    }
+
+    private final String boundary = "===" + System.currentTimeMillis() + "===";
+    private final String LINE_FEED = "\r\n";
 
     public RequestHelper.Response connect() throws RequestException{
         try{
@@ -61,32 +89,74 @@ public class RequestHelper {
             }
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
-            con.setDoInput(true);
-            con.setDoOutput(true);
-
             con.setRequestMethod(requestType.name());
 
+            con.setUseCaches(useCaches);
+            con.setDefaultUseCaches(useDefaultCaches);
+
             if(headers.size() > 0) {
-                boolean b = true;
                 for (String n : headers.keySet()) {
-                    if (b) {
-                        con.setRequestProperty(n, headers.get(n));
-                        b = false;
-                    } else {
-                        con.addRequestProperty(n, headers.get(n));
-                    }
+                    con.addRequestProperty(n, headers.get(n));
                 }
             }
+            con.setDoInput(true);
 
             if(requestType != RequestType.GET && !query.isEmpty()) {
+                if(files.size() != 0){
+                    con.setRequestProperty("Content-Type",
+                            "multipart/form-data;boundary=" + boundary);
+                }
+                con.setDoOutput(true);
                 BufferedWriter writer = new BufferedWriter(
                         new OutputStreamWriter(con.getOutputStream(), encoding));
 
-                writer.write(buildQuery());
+                if(files.size() != 0){
+                    for(String n : query.keySet()){
+                        writer.append("--" + boundary).append(LINE_FEED);
+                        writer.append("Content-Disposition: form-data; name=\"" + URLEncoder.encode(n, encoding) + "\"")
+                                .append(LINE_FEED);
+                        writer.append("Content-Type: text/plain; charset=" + encoding).append(
+                                LINE_FEED);
+                        writer.append(LINE_FEED);
+                        writer.append(URLEncoder.encode(query.get(n), encoding)).append(LINE_FEED);
+                        writer.flush();
+                    }
+
+                    for(String n : files.keySet()){
+                        String fileName = Integer.toHexString(new Random().nextInt()) + "_" + Integer.toHexString(new Random().nextInt()) + "_" + Integer.toHexString(new Random().nextInt()) +Integer.toHexString(new Random().nextInt()) +Integer.toHexString(new Random().nextInt()) +Integer.toHexString(new Random().nextInt());
+                        writer.append("--" + boundary).append(LINE_FEED);
+                        writer.append(
+                                "Content-Disposition: form-data; name=\"" + n
+                                        + "\"; filename=\"" + fileName + "\"")
+                                .append(LINE_FEED);
+                        writer.append(
+                                "Content-Type: "
+                                        + URLConnection.guessContentTypeFromName(fileName))
+                                .append(LINE_FEED);
+                        writer.append("Content-Transfer-Encoding: binary").append(LINE_FEED);
+                        writer.append(LINE_FEED);
+                        writer.flush();
+
+                        InputStreamReader inputStream = new InputStreamReader(files.get(n));
+                        char[] buffer = new char[4096];
+                        int bytesRead = -1;
+                        while ((bytesRead = inputStream.read(buffer)) != -1) {
+                            writer.write(buffer, 0, bytesRead);
+                        }
+                        writer.flush();
+                        inputStream.close();
+
+
+                        writer.flush();
+                    }
+                    writer.append(LINE_FEED).flush();
+                    writer.append("--" + boundary + "--").append(LINE_FEED);
+                }else{
+                    writer.write(buildQuery());
+                }
 
                 writer.flush();
                 writer.close();
-                System.out.println(buildQuery());
             }
 
             con.connect();
@@ -127,6 +197,19 @@ public class RequestHelper {
             try {
                 q.append(URLEncoder.encode(key, "UTF-8")).append("=")
                         .append(URLEncoder.encode(query.get(key), "UTF-8"));
+            } catch (UnsupportedEncodingException ex) {
+                throw new RequestException("Unsupport utf-8 encoding", ex);
+            }
+        }
+        for (String key : query_i.keySet()) {
+            if (first) {
+                first = false;
+            } else {
+                q.append("&");
+            }
+            try {
+                q.append(URLEncoder.encode(key, "UTF-8")).append("=")
+                        .append(query_i.get(key));
             } catch (UnsupportedEncodingException ex) {
                 throw new RequestException("Unsupport utf-8 encoding", ex);
             }

@@ -1,18 +1,15 @@
 package com.SHGroup.cometooceantofish.fragments;
 
-import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
-/**
- * Created by c on 2018-01-20.
- */
+public class FragmentBase extends Fragment {
+    private String access_token;
 
-public abstract class FragmentBase extends Fragment {
-    protected FragmentBase(){}
+    protected String getAccessToken(){
+        return "JWT " + access_token;
+    }
 
-    public abstract View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState);
+    public void setAccessToken(String access_token){
+        this.access_token = access_token;
+    }
 }

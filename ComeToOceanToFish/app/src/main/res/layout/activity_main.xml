@@ -33,12 +33,6 @@
             android:layout_height="wrap_content">
 
             <android.support.design.widget.TabItem
-                android:id="@+id/landing"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="메인" />
-
-            <android.support.design.widget.TabItem
                 android:id="@+id/lend"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
