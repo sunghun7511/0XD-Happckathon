@@ -4,18 +4,13 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
-
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
-
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -32,7 +27,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
 
-public class LoginActivity extends Activity {
+public class RegisterActivity extends Activity {
 
     private UserLoginTask mAuthTask = null;
 
@@ -59,9 +54,9 @@ public class LoginActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         // Set up the login form.
-        mIDView = (EditText) findViewById(R.id.login_id);
+        mIDView = (EditText) findViewById(R.id.id);
 
-        mPasswordView = (EditText) findViewById(R.id.login_password);
+        mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
@@ -73,26 +68,17 @@ public class LoginActivity extends Activity {
             }
         });
 
-        Button login = (Button) findViewById(R.id.sign_in_button);
-        login.setOnClickListener(new OnClickListener() {
+        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
+        mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 attemptLogin();
             }
         });
 
-        Button register = (Button) findViewById(R.id.login_sign_up_button);
-        register.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                
-            }
-        });
-
-
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
-        mBackground = (RelativeLayout) findViewById(R.id.login_background);
+        mBackground = (RelativeLayout) findViewById(R.id.background);
 
         Bitmap b1 = BitmapFactory.decodeResource(getResources(),
                 R.drawable.ocean1);
@@ -110,8 +96,8 @@ public class LoginActivity extends Activity {
         back.add(back1);
         back.add(back2);
 
-        fade_in = AnimationUtils.loadAnimation(LoginActivity.this, R.anim.fade_in);
-        fade_out = AnimationUtils.loadAnimation(LoginActivity.this, R.anim.fade_out);
+        fade_in = AnimationUtils.loadAnimation(RegisterActivity.this, R.anim.fade_in);
+        fade_out = AnimationUtils.loadAnimation(RegisterActivity.this, R.anim.fade_out);
 
         fade_out.setAnimationListener(new Animation.AnimationListener() {
             @Override
