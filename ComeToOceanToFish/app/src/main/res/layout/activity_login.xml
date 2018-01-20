@@ -35,54 +35,49 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="30px"
-            android:background="#88ffffff">
+            android:background="#88ffffff"
+            android:orientation="vertical">
 
-            <LinearLayout
-                android:id="@+id/email_login_form"
+            <EditText
+                android:id="@+id/login_id"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:hint="@string/prompt_id"
+                android:inputType="text"
+                android:maxLines="1"
+                android:singleLine="true" />
 
-                <EditText
-                    android:id="@+id/login_id"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/prompt_id"
-                    android:inputType="text"
-                    android:maxLines="1"
-                    android:singleLine="true" />
+            <EditText
+                android:id="@+id/login_password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/prompt_password"
+                android:imeActionId="6"
+                android:imeActionLabel="@string/action_sign_in_short"
+                android:imeOptions="actionUnspecified"
+                android:inputType="textPassword"
+                android:maxLines="1"
+                android:singleLine="true" />
 
-                <EditText
-                    android:id="@+id/login_password"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/prompt_password"
-                    android:imeActionId="6"
-                    android:imeActionLabel="@string/action_sign_in_short"
-                    android:imeOptions="actionUnspecified"
-                    android:inputType="textPassword"
-                    android:maxLines="1"
-                    android:singleLine="true" />
+            <Button
+                android:id="@+id/sign_in_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:text="@string/action_sign_in"
+                android:textColor="@color/primaryTextColor"
+                android:background="@color/primaryColor" />
+                android:background="@color/primaryColor" />
 
-                <Button
-                    android:id="@+id/sign_in_button"
-                    style="?android:textAppearanceSmall"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="@string/action_sign_in"
-                    android:textStyle="bold" />
-
-                <Button
-                    android:id="@+id/login_sign_up_button"
-                    style="?android:textAppearanceSmall"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="@string/action_register"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
+            <Button
+                android:id="@+id/login_sign_up_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:text="@string/action_register"
+                android:textColor="@color/primaryTextColor"
+                android:background="@color/primaryColor"
+                android:elevation="2dp" />
         </LinearLayout>
     </RelativeLayout>
 </RelativeLayout>

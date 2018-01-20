@@ -93,8 +93,11 @@
                     style="?android:textAppearanceSmall"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
+                    android:layout_margin="8dp"
                     android:text="@string/action_register"
+                    android:textColor="@color/primaryTextColor"
+                    android:background="@color/primaryColor"
+                    android:elevation="2dp"
                     android:textStyle="bold" />
 
             </LinearLayout>

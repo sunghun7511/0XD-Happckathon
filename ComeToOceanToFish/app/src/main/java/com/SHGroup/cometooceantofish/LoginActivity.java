@@ -14,6 +14,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.JsonReader;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -29,6 +30,10 @@ import android.widget.Toast;
 
 import com.SHGroup.cometooceantofish.api.RequestException;
 import com.SHGroup.cometooceantofish.api.RequestHelper;
+
+import org.json.JSONObject;
+import org.json.JSONStringer;
+import org.json.JSONTokener;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -238,6 +243,8 @@ public class LoginActivity extends Activity {
         private final String mUsername;
         private final String mPassword;
 
+        private String access_token;
+
         UserLoginTask(String username, String password) {
             mUsername = username;
             mPassword = password;
@@ -250,12 +257,18 @@ public class LoginActivity extends Activity {
                         .putQuery("pw", mPassword).connect();
 
                 if(res.getResponseCode() == 200){
+                    try{
+                        access_token = new JSONObject(res.getBody()).getString("access_token");
+                    }catch(Exception e){
+                        e.printStackTrace();
+                    }
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             Toast.makeText(LoginActivity.this, "성공적으로 로그인 하였습니다.", Toast.LENGTH_LONG).show();
 
                             Intent i = new Intent(LoginActivity.this, MainActivity.class);
+                            i.putExtra("access_token", access_token);
                             startActivity(i);
                         }
                     });
@@ -304,5 +317,3 @@ public class LoginActivity extends Activity {
         }
     }
 }
-
-노드제이에스 만세
