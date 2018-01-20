@@ -19,6 +19,10 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
+
+import com.SHGroup.cometooceantofish.api.RequestException;
+import com.SHGroup.cometooceantofish.api.RequestHelper;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -26,7 +30,7 @@ import java.util.Vector;
 
 public class RegisterActivity extends Activity {
 
-    private UserLoginTask mAuthTask = null;
+    private UserRegisterTask mAuthTask = null;
 
     private EditText mIDView;
     private EditText mPasswordView;
@@ -53,7 +57,7 @@ public class RegisterActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
-        // Set up the login form.
+
         mIDView = (EditText) findViewById(R.id.register_id);
         mPasswordView = (EditText) findViewById(R.id.register_password);
         mPasswordReView= (EditText) findViewById(R.id.register_repassword);
@@ -61,8 +65,8 @@ public class RegisterActivity extends Activity {
         mPhoneView= (EditText) findViewById(R.id.register_phone_numb);
 
 
-        Button mEmailSignInButton = (Button) findViewById(R.id.register_sign_up);
-        mEmailSignInButton.setOnClickListener(new OnClickListener() {
+        Button signup = (Button) findViewById(R.id.register_sign_up);
+        signup.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 attemptRegister();
@@ -138,8 +142,10 @@ public class RegisterActivity extends Activity {
         // Reset errors.
         mIDView.setError(null);
         mPasswordView.setError(null);
+        mPasswordReView.setError(null);
+        mNicknameView.setError(null);
+        mPhoneView.setError(null);
 
-        // Store values at the time of the login attempt.
         String username = mIDView.getText().toString();
         String password = mPasswordView.getText().toString();
         String passwordre = mPasswordReView.getText().toString();
@@ -176,7 +182,7 @@ public class RegisterActivity extends Activity {
             focusView.requestFocus();
         } else {
             showProgress(true);
-            mAuthTask = new UserLoginTask(username, password, nickname, phone);
+            mAuthTask = new UserRegisterTask(username, password, nickname, phone);
             mAuthTask.execute((Void) null);
         }
     }
@@ -217,15 +223,15 @@ public class RegisterActivity extends Activity {
         }
     }
 
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
+    public class UserRegisterTask extends AsyncTask<Void, Void, Boolean> {
 
-        private final String mUername;
+        private final String mUsername;
         private final String mPassword;
         private final String mNickname;
         private final String mPhone;
 
-        UserLoginTask(String username, String password, String nickname, String phone) {
-            mUername = username;
+        UserRegisterTask(String username, String password, String nickname, String phone) {
+            mUsername = username;
             mPassword = password;
             mNickname = nickname;
             mPhone = phone;
@@ -233,8 +239,41 @@ public class RegisterActivity extends Activity {
 
         @Override
         protected Boolean doInBackground(Void... params) {
+            try{
 
-            return true;
+                final RequestHelper.Response res = new RequestHelper("http://ec2.istruly.sexy:1234/signup").setRequestType(RequestHelper.RequestType.POST).putQuery("id", mUsername)
+                        .putQuery("pw", mPassword).putQuery("nickname", mNickname).putQuery("phone",mPhone).connect();
+
+                if(res.getResponseCode() == 201){
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(RegisterActivity.this, "성공적으로 회원가입 하였습니다.", Toast.LENGTH_LONG).show();
+                        }
+                    });
+                    return true;
+                }else if(res.getResponseCode() == 205){
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(RegisterActivity.this, "이미 존재하는 아이디입니다.", Toast.LENGTH_LONG).show();
+                        }
+                    });
+                    mIDView.setError("이미 존재하는 아이디입니다.");
+                    mIDView.requestFocus();
+                }else{
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(RegisterActivity.this, "회원가입에 실패하였습니다.\n(" + res.getResponseCode() + ")", Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+            }catch(RequestException ex){
+                ex.printStackTrace();
+                ex.getOriginalException().printStackTrace();
+            }
+            return false;
         }
 
         @Override
@@ -244,9 +283,6 @@ public class RegisterActivity extends Activity {
 
             if (success) {
                 finish();
-            } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
             }
         }
 

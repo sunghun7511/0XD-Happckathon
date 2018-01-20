@@ -13,9 +13,7 @@ import android.os.AsyncTask;
 
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -27,6 +25,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.SHGroup.cometooceantofish.api.RequestException;
+import com.SHGroup.cometooceantofish.api.RequestHelper;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -233,21 +235,56 @@ public class LoginActivity extends Activity {
 
     public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
 
-        private final String mUername;
+        private final String mUsername;
         private final String mPassword;
 
         UserLoginTask(String username, String password) {
-            mUername = username;
+            mUsername = username;
             mPassword = password;
         }
 
         @Override
         protected Boolean doInBackground(Void... params) {
+            try{
+                final RequestHelper.Response res = new RequestHelper("http://ec2.istruly.sexy:1234/auth").setRequestType(RequestHelper.RequestType.POST).putQuery("id", mUsername)
+                        .putQuery("pw", mPassword).connect();
 
+                if(res.getResponseCode() == 200){
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(LoginActivity.this, "성공적으로 로그인 하였습니다.", Toast.LENGTH_LONG).show();
 
-//            Intent main_activity = new Intent(Intent.ACTION_CALL, )
+                            Intent i = new Intent(LoginActivity.this, MainActivity.class);
+                            startActivity(i);
+                        }
+                    });
+                    return true;
+                }else if(res.getResponseCode() == 401){
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(LoginActivity.this, "로그인에 실패하였습니다.", Toast.LENGTH_LONG).show();
+                            mIDView.setError("로그인에 실패하였습니다.");
+                            mIDView.requestFocus();
+                        }
+                    });
+                }else{
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(LoginActivity.this, "로그인에 실패하였습니다.\n(" + res.getResponseCode() + ")", Toast.LENGTH_LONG).show();
+                            mIDView.setError("로그인에 실패하였습니다.");
+                            mIDView.requestFocus();
+                        }
+                    });
+                }
+            }catch(RequestException ex){
+                ex.printStackTrace();
+                ex.getOriginalException().printStackTrace();
+            }
 
-            return true;
+            return false;
         }
 
         @Override
@@ -257,9 +294,6 @@ public class LoginActivity extends Activity {
 
             if (success) {
                 finish();
-            } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
             }
         }
 
@@ -271,3 +305,4 @@ public class LoginActivity extends Activity {
     }
 }
 
+노드제이에스 만세

@@ -79,34 +79,34 @@ public class RequestHelper {
             }
 
             if(requestType != RequestType.GET && !query.isEmpty()) {
-                OutputStream os = con.getOutputStream();
                 BufferedWriter writer = new BufferedWriter(
-                        new OutputStreamWriter(os, encoding));
+                        new OutputStreamWriter(con.getOutputStream(), encoding));
 
                 writer.write(buildQuery());
 
                 writer.flush();
                 writer.close();
-                os.close();
+                System.out.println(buildQuery());
             }
 
             con.connect();
 
             StringBuilder sb = new StringBuilder();
 
-
-            BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), encoding));
-            String n;
-            boolean first = true;
-            while((n = br.readLine()) != null) {
-                if (first) {
-                    first = false;
-                } else {
-                    sb.append("\r\n");
+            if(con.getResponseCode() < 300) {
+                BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), encoding));
+                String n;
+                boolean first = true;
+                while ((n = br.readLine()) != null) {
+                    if (first) {
+                        first = false;
+                    } else {
+                        sb.append("\r\n");
+                    }
+                    sb.append(n);
                 }
-                sb.append(n);
+                br.close();
             }
-            br.close();
 
             return new Response(con.getResponseCode(), con.getHeaderFields(), sb.toString());
         }catch(Exception ex){
