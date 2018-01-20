@@ -21,7 +21,7 @@
         android:paddingTop="@dimen/activity_vertical_margin">
         <!-- Login progress -->
         <ProgressBar
-            android:id="@+id/register_process"
+            android:id="@+id/register_progress"
             style="?android:attr/progressBarStyleLarge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -43,7 +43,7 @@
                 android:orientation="vertical">
 
                 <EditText
-                    android:id="@+id/id"
+                    android:id="@+id/register_id"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/prompt_id"
@@ -52,7 +52,7 @@
                     android:singleLine="true" />
 
                 <EditText
-                    android:id="@+id/password"
+                    android:id="@+id/register_password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/prompt_password"
@@ -61,7 +61,7 @@
                     android:singleLine="true" />
 
                 <EditText
-                    android:id="@+id/repassword"
+                    android:id="@+id/register_repassword"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/prompt_password_re"
@@ -70,7 +70,7 @@
                     android:singleLine="true" />
 
                 <EditText
-                    android:id="@+id/nickname"
+                    android:id="@+id/register_nickname"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/prompt_nickname"
@@ -79,7 +79,7 @@
                     android:singleLine="true" />
 
                 <EditText
-                    android:id="@+id/phone_numb"
+                    android:id="@+id/register_phone_numb"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/prompt_phone_numb"
@@ -88,7 +88,7 @@
                     android:singleLine="true" />
 
                 <Button
-                    android:id="@+id/email_sign_up_button"
+                    android:id="@+id/register_sign_up"
                     style="?android:textAppearanceSmall"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

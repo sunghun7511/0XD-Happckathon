@@ -85,26 +85,27 @@ public class LoginActivity extends Activity {
         register.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                
+                Intent i = new Intent(LoginActivity.this, RegisterActivity.class);
+                startActivity(i);
             }
         });
 
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+
+
         mBackground = (RelativeLayout) findViewById(R.id.login_background);
 
         Bitmap b1 = BitmapFactory.decodeResource(getResources(),
                 R.drawable.ocean1);
-
-        BitmapDrawable back1 = new BitmapDrawable(b1);
-        back1.setGravity(Gravity.FILL_VERTICAL | Gravity.CENTER);
-
-
         Bitmap b2 = BitmapFactory.decodeResource(getResources(),
                 R.drawable.ocean2);
 
+        BitmapDrawable back1 = new BitmapDrawable(b1);
         BitmapDrawable back2 = new BitmapDrawable(b2);
+
+        back1.setGravity(Gravity.FILL_VERTICAL | Gravity.CENTER);
         back2.setGravity(Gravity.FILL_VERTICAL | Gravity.CENTER);
 
         back.add(back1);

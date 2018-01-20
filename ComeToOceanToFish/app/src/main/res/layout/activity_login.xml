@@ -43,7 +43,7 @@
                 android:orientation="vertical">
 
                 <EditText
-                    android:id="@+id/id"
+                    android:id="@+id/login_id"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/prompt_id"
@@ -52,7 +52,7 @@
                     android:singleLine="true" />
 
                 <EditText
-                    android:id="@+id/password"
+                    android:id="@+id/login_password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/prompt_password"
