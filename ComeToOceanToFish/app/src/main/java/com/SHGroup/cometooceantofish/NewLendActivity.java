@@ -216,11 +216,6 @@ public class NewLendActivity extends Activity {
                         .connect();
 
                 if(res.getResponseCode() == 201){
-                    try{
-                        access_token = new JSONObject(res.getBody()).getString("access_token");
-                    }catch(Exception e){
-                        e.printStackTrace();
-                    }
                     String re = res.getBody();
                     FileOutputStream out = null;
                     try {

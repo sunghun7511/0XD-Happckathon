@@ -14,7 +14,9 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,27 +28,22 @@ import com.SHGroup.cometooceantofish.fragments.LendCategory;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileOutputStream;
 
 public class UploadPostActivity extends Activity {
 
-    private ViewLendTask mViewLendTask = null;
+    private UploadPostTask mUploadPostTask = null;
 
     private TextView mTitle;
-    private TextView mLendCategory;
-    private TextView mHourPrice;
-    private TextView mDayPrice;
     private TextView mContent;
-    private TextView mAuthorID;
-    private TextView mAuthorNickname;
-    private TextView mAuthorPhone;
 
     private ImageView viewlend;
 
     private Bitmap bitmap;
 
-    private String access_token;
+    private Button upload;
 
-    private String id;
+    private String access_token;
 
     private View mProgressView;
     private View mNewLendFormView;
@@ -54,29 +51,36 @@ public class UploadPostActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_view_lend);
+        setContentView(R.layout.activity_upload_post);
+
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"), 1);
 
         access_token = getIntent().getStringExtra("access_token");
-        id = getIntent().getStringExtra("id");
 
-        // Set up the login form.
-        mTitle = (TextView) findViewById(R.id.view_lend_title);
-        mLendCategory = (TextView) findViewById(R.id.view_lend_category);
-        mHourPrice = (TextView) findViewById(R.id.view_lend_hour_price);
-        mDayPrice = (TextView) findViewById(R.id.view_lend_day_price);
-        mContent = (TextView) findViewById(R.id.view_lend_content);
-        mAuthorID = (TextView) findViewById(R.id.view_lend_author_id);
-        mAuthorNickname = (TextView) findViewById(R.id.view_lend_author_nickname);
-        mAuthorPhone = (TextView) findViewById(R.id.view_lend_author_phone);
+        mTitle = (TextView) findViewById(R.id.upload_post_title);
+        mContent = (TextView) findViewById(R.id.upload_post_content);
 
-        mNewLendFormView = findViewById(R.id.view_lend_form);
-        mProgressView = findViewById(R.id.view_lend_progress);
+        mNewLendFormView = findViewById(R.id.upload_post_form);
+        mProgressView = findViewById(R.id.upload_post_progress);
 
-        viewlend = (ImageView)findViewById(R.id.viewlend);
+        viewlend = (ImageView) findViewById(R.id.post_image);
 
-        showProgress(true);
-        mViewLendTask = new ViewLendTask();
-        mViewLendTask.execute((Void) null);
+        upload = (Button) findViewById(R.id.upload_post_button);
+        upload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(mTitle.getText().length() <= 4){
+                    mTitle.setError("제목의 길이는 5글자 이상이어야 합니다.");
+                    mTitle.requestFocus();
+                    return;
+                }
+                showProgress(true);
+                mUploadPostTask = new UploadPostTask(mTitle.getText().toString(), mContent.getText().toString());
+                mUploadPostTask.execute((Void) null);
+            }
+        });
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -86,7 +90,7 @@ public class UploadPostActivity extends Activity {
             try {
                 bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
 
-                ImageView imageView = (ImageView) findViewById(R.id.lendimage);
+                ImageView imageView = (ImageView) findViewById(R.id.post_image);
                 imageView.setImageBitmap(bitmap);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -127,69 +131,69 @@ public class UploadPostActivity extends Activity {
         }
     }
 
-    public class ViewLendTask extends AsyncTask<Void, Void, Boolean> {
+    public class UploadPostTask extends AsyncTask<Void, Void, Boolean> {
 
-        ViewLendTask() {
+        private String mTitle;
+        private String mContent;
+
+        UploadPostTask(String title, String content) {
+            mTitle = title;
+            mContent = content;
         }
 
         @Override
         protected Boolean doInBackground(Void... params) {
             try{
-                final RequestHelper.Response res = new RequestHelper("http://ec2.istruly.sexy:1234/rent").setRequestType(RequestHelper.RequestType.GET)
+                final RequestHelper.Response res = new RequestHelper("http://ec2.istruly.sexy:1234/boast").setRequestType(RequestHelper.RequestType.POST)
                         .putHeader("Authorization", access_token)
-                        .putQuery("id", id)
+                        .putQuery("title", mTitle)
+                        .putQuery("content", mContent)
                         .connect();
 
-                if(res.getResponseCode() == 200){
+                if(res.getResponseCode() == 201){
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                         try{
-                            JSONObject jo = new JSONObject(res.getBody());
-
-                            String title = jo.getString("title");
-                            String day_price = jo.getString("day_price");
-                            String hour_price = jo.getString("hour_price");
-                            String content = jo.getString("content");
-                            String category = LendCategory.getCategoryFromCode(Integer.parseInt(jo.getString("category"))).getKorean();
-                            String author_id = jo.getString("author_id");
-                            String author_nickname = jo.getString("author_nickname");
-                            String author_phone = jo.getString("author_phone");
-
-                            mTitle.setText(title);
-                            mDayPrice.setText("하루당 가격 : " + day_price);
-                            mHourPrice.setText("시간당 가격 : " + hour_price);
-                            mLendCategory.setText("카테고리 : " + category);
-                            mContent.setText(content);
-                            mAuthorID.setText("ID : " + author_id);
-                            mAuthorNickname.setText("Nickname : " + author_nickname);
-                            mAuthorPhone.setText("Phone : " + author_phone);
-
-                            File file = new File(getFilesDir(), id + ".bmp");
+                            String id = res.getBody();
+                            File file = new File(getFilesDir(), id + ".post.bmp");
                             Drawable dr = null;
-                            if(file != null) {
-                                dr = new BitmapDrawable(BitmapFactory.decodeFile(file.getAbsolutePath()));
-                                viewlend.setImageDrawable(dr);
+                            FileOutputStream out = null;
+                            try {
+                                out = new FileOutputStream(file);
+                                bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+                                out.flush();
+                                out.close();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            } finally {
+                                try {
+                                    if (out != null) {
+                                        out.close();
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
                             }
-
+                            viewlend.setImageDrawable(dr);
                         }catch(Exception e){
                             e.printStackTrace();
                         }
                         }
                     });
                     return true;
-                }else if(res.getResponseCode() == 204){
+                }else if(res.getResponseCode() == 205){
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(UploadPostActivity.this, "글이 없습니다.", Toast.LENGTH_LONG).show();
+                            Toast.makeText(UploadPostActivity.this, "제목이 너무 짧습니다.", Toast.LENGTH_LONG).show();
                         }
                     });
                 }else{
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(UploadPostActivity.this, "글을 볼 수 없습니다.\n(" + res.getResponseCode() + ")", Toast.LENGTH_LONG).show();
+                            Toast.makeText(UploadPostActivity.this, "글을 쓸 수 없습니다.\n(" + res.getResponseCode() + ")", Toast.LENGTH_LONG).show();
                         }
                     });
                 }
@@ -203,17 +207,17 @@ public class UploadPostActivity extends Activity {
 
         @Override
         protected void onPostExecute(final Boolean success) {
-            mViewLendTask = null;
+            mUploadPostTask = null;
             showProgress(false);
 
-            if (!success) {
+            if (success) {
                 finish();
             }
         }
 
         @Override
         protected void onCancelled() {
-            mViewLendTask = null;
+            mUploadPostTask = null;
             showProgress(false);
         }
     }

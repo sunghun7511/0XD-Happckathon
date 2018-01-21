@@ -63,36 +63,18 @@ public class CommunityFragment extends FragmentBase{
         mProgressBar = (ProgressBar) rootView.findViewById(R.id.community_progress);
         list_form = rootView.findViewById(R.id.community_form);
 
-        upload = (Button) rootView.findViewById(R.id.upload_post);
+        upload = (Button) rootView.findViewById(R.id.community_upload_button);
         upload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(getActivity(), UploadPostActivity.class);
+                i.putExtra("access_token", getAccessToken());
                 startActivity(i);
             }
         });
 
         adapter = new CustomPostArrayAdapter();
         mPostList.setAdapter(adapter);
-
-        mPostList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView parent, View v, int position, long id) {
-                LendItem item = (LendItem) parent.getItemAtPosition(position);
-
-                if(item == null){
-                    Intent newLend = new Intent(getActivity(), NewLendActivity.class);
-                    newLend.putExtra("access_token", getAccessToken());
-                    startActivity(newLend);
-                    return;
-                }
-
-                Intent i = new Intent(getActivity(), LendViewActivity.class);
-                i.putExtra("id", item.getId());
-                i.putExtra("access_token", getAccessToken());
-                startActivity(i);
-            }
-        }) ;
 
         showProgress(true);
 
@@ -158,15 +140,13 @@ public class CommunityFragment extends FragmentBase{
                     if(res.getResponseCode() == 200){
                         try{
                             JSONArray jar = new JSONArray(res.getBody());
-                            File parent = new File(getActivity().getFilesDir(), "posts_img");
-                            if(!parent.exists()){
-                                parent.mkdirs();
-                            }
-                            for(int i = 0 ; i < jar.length() ; i ++){
+                            for(int i = jar.length() - 1 ; i >= 0 ; i --){
                                 JSONObject jo = jar.getJSONObject(i);
-                                File file = new File(parent, jo.getString("id") + ".bmp");
+                                File file = new File(getActivity().getFilesDir(), jo.getString("id") + ".post.bmp");
                                 Drawable dr = null;
-                                if(file != null)
+                                Log.i("aaa", " " + file.exists());
+                                Log.i("aaa", " " + getActivity().getFilesDir().getAbsolutePath());
+                                if(file.exists())
                                     dr = new BitmapDrawable(BitmapFactory.decodeFile(file.getAbsolutePath()));
 
                                 adapter.addItem(dr, jo.getString("id"), jo.getString("title"), jo.getString("content"), jo.getString("date"), jo.getString("author_nickname"));

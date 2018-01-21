@@ -154,11 +154,12 @@ public class LendFragment extends FragmentBase {
                     if(res.getResponseCode() == 200){
                         try{
                             JSONArray jar = new JSONArray(res.getBody());
-                            for(int i = 0 ; i < jar.length() ; i ++){
+                            for(int i = jar.length() - 1 ; i >= 0; i --){
                                 JSONObject jo = jar.getJSONObject(i);
+                                System.out.println(jo);
                                 File file = new File(getActivity().getFilesDir(), jo.getString("id") + ".bmp");
                                 Drawable dr = null;
-                                if(file != null)
+                                if(file != null && file.exists())
                                     dr = new BitmapDrawable(BitmapFactory.decodeFile(file.getAbsolutePath()));
 
                                 adapter.addItem(dr, jo.getString("id"), jo.getString("title"),

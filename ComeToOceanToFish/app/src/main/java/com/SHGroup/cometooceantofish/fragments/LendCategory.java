@@ -1,7 +1,7 @@
 package com.SHGroup.cometooceantofish.fragments;
 
 public enum LendCategory {
-    FISHING_ROD("낚싯대", 0), BAIT("미끼", 1), ETC("기타", 0x50);
+    FISHING_ROD("낚싯대", 0), BAIT("미끼", 1), FOOD("식료품", 2), SHEEP("선박", 3), ETC("기타", 0x50);
     private final String kor;
     private final int code;
 

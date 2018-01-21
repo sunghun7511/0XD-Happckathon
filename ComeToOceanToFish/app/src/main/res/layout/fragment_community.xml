@@ -1,40 +1,44 @@
-<ScrollView
+<android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/constraintLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:scrollbars="vertical"
     tools:context="com.SHGroup.cometooceantofish.fragments.CommunityFragment">
-
-    <ProgressBar
-        android:id="@+id/community_progress"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:layout_marginBottom="8dp"
-        android:visibility="gone" />
-
-    <LinearLayout
-        android:id="@+id/community_form"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <Button
-            android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <ProgressBar
+            android:id="@+id/community_progress"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="글 올리기"
-            android:textColor="@color/primaryTextColor"
-            android:background="@color/primaryLightColor"
-            android:elevation="2dp"
-            android:id="@+id/upload_post"
-            android:layout_margin="10dp"/>
+            android:layout_centerInParent="true"
+            android:layout_marginBottom="8dp"
+            android:visibility="gone" />
 
-        <ListView
-            android:id="@+id/communitylist"
+        <LinearLayout
+            android:id="@+id/community_form"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-        </ListView>
-    </LinearLayout>
-</ScrollView>
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="글 올리기"
+                android:textColor="@color/primaryTextColor"
+                android:background="@color/primaryLightColor"
+                android:elevation="2dp"
+                android:id="@+id/community_upload_button"
+                android:layout_margin="10dp"/>
+
+            <ListView
+                android:id="@+id/communitylist"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+            </ListView>
+        </LinearLayout>
+    </RelativeLayout>
+</android.support.constraint.ConstraintLayout>

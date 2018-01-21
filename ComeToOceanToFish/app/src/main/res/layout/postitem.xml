@@ -16,8 +16,6 @@
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
             android:id="@+id/post_image"
-            android:maxHeight="100px"
-            android:maxWidth="100px"
             android:layout_weight="1" />
 
         <TextView
