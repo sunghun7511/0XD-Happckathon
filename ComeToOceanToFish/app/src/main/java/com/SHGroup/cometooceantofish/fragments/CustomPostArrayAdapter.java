@@ -24,6 +24,10 @@ public class CustomPostArrayAdapter extends BaseAdapter {
         return postItemList.size();
     }
 
+    public void clear(){
+        postItemList.clear();
+    }
+
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
         final int pos = i;

@@ -90,10 +90,20 @@ public class LendFragment extends FragmentBase {
 
         showProgress(true);
 
-        mLoadTask = new LoadLendListTask(rootView);
+        mLoadTask = new LoadLendListTask();
         mLoadTask.execute((Void) null);
 
         return rootView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        showProgress(true);
+
+        mLoadTask = new LoadLendListTask();
+        mLoadTask.execute((Void) null);
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
@@ -125,10 +135,8 @@ public class LendFragment extends FragmentBase {
     }
     public class LoadLendListTask extends AsyncTask<Void, Void, Boolean> {
 
-        private View rootView;
+        private LoadLendListTask(){
 
-        private LoadLendListTask(View rootView){
-            this.rootView = rootView;
         }
 
         private final Drawable getDrawable(String u) throws Exception{
@@ -148,19 +156,19 @@ public class LendFragment extends FragmentBase {
                 final RequestHelper.Response res = new RequestHelper("http://ec2.istruly.sexy:1234/rentlist").putDefaultHeader().putHeader("Authorization", getAccessToken())
                         .putQuery("category", Integer.toString(LendCategory.FISHING_ROD.getCode())).connect();
 
-                Log.i("ii", Integer.toString(res.getResponseCode()));
-
                 if(res.getResponseCode() == 200 || res.getResponseCode() == 204){
                     if(res.getResponseCode() == 200){
                         try{
+                            adapter.clear();
+
                             JSONArray jar = new JSONArray(res.getBody());
                             for(int i = jar.length() - 1 ; i >= 0; i --){
                                 JSONObject jo = jar.getJSONObject(i);
-                                System.out.println(jo);
+
                                 File file = new File(getActivity().getFilesDir(), jo.getString("id") + ".bmp");
                                 Drawable dr = null;
                                 if(file != null && file.exists())
-                                    dr = new BitmapDrawable(BitmapFactory.decodeFile(file.getAbsolutePath()));
+                                    dr = new BitmapDrawable(Bitmap.createScaledBitmap(BitmapFactory.decodeFile(file.getAbsolutePath()), 100, 100, true));
 
                                 adapter.addItem(dr, jo.getString("id"), jo.getString("title"),
                                         LendCategory.getCategoryFromCode(Integer.parseInt(jo.getString("category"))).getKorean());

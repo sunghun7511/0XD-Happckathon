@@ -52,11 +52,12 @@ public class CommunityFragment extends FragmentBase{
     private Button upload;
 
     private View list_form;
+    private View rootView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_community, container, false);
+        rootView = inflater.inflate(R.layout.fragment_community, container, false);
 
         mPostList = (ListView) rootView.findViewById(R.id.communitylist);
 
@@ -78,10 +79,20 @@ public class CommunityFragment extends FragmentBase{
 
         showProgress(true);
 
-        mLoadTask = new PostLoadTask(rootView);
+        mLoadTask = new PostLoadTask();
         mLoadTask.execute((Void) null);
 
         return rootView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        showProgress(true);
+
+        mLoadTask = new PostLoadTask();
+        mLoadTask.execute((Void) null);
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
@@ -114,10 +125,7 @@ public class CommunityFragment extends FragmentBase{
 
     public class  PostLoadTask extends AsyncTask<Void, Void, Boolean> {
 
-        private View rootView;
-
-        private PostLoadTask(View rootView){
-            this.rootView = rootView;
+        private PostLoadTask(){
         }
 
         private final Drawable getDrawable(String u) throws Exception{
@@ -139,6 +147,8 @@ public class CommunityFragment extends FragmentBase{
                 if(res.getResponseCode() == 200 || res.getResponseCode() == 204){
                     if(res.getResponseCode() == 200){
                         try{
+                            adapter.clear();
+
                             JSONArray jar = new JSONArray(res.getBody());
                             for(int i = jar.length() - 1 ; i >= 0 ; i --){
                                 JSONObject jo = jar.getJSONObject(i);

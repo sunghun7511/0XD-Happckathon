@@ -20,6 +20,10 @@ public class CustomArrayAdapter extends BaseAdapter {
     public CustomArrayAdapter(){
     }
 
+    public void clear(){
+        listViewItemList.clear();
+    }
+
     @Override
     public int getCount() {
         return listViewItemList.size() + 1 ;
